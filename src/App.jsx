@@ -132,6 +132,18 @@ const CSS = `
 
   @keyframes spin { to { transform: rotate(360deg); } }
   .spin { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--gold); border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 5px; }
+
+  /* Password gate */
+  .pw-wrap { min-height: 100vh; background: var(--ink); display: flex; align-items: center; justify-content: center; }
+  .pw-box { background: var(--paper); border-top: 3px solid var(--accent); padding: 40px 36px; width: 100%; max-width: 380px; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
+  .pw-box h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; margin-bottom: 6px; }
+  .pw-box h1 em { color: var(--accent); font-style: italic; }
+  .pw-sub { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 24px; }
+  .pw-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); background: var(--card); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--ink); margin-bottom: 10px; }
+  .pw-input:focus { outline: 2px solid var(--accent2); }
+  .pw-btn { width: 100%; padding: 11px; background: var(--accent); color: white; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+  .pw-btn:hover { background: #a83d27; }
+  .pw-error { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); margin-top: 8px; text-align: center; }
 `
 
 if (!document.getElementById('eop-styles')) {
@@ -182,8 +194,40 @@ function Modal({ title, onClose, onSave, saveLabel='Save', children }) {
   )
 }
 
+// ── Password ─────────────────────────────────────────────────────────────────
+const PASSWORD = 'OdumPlanner'  // ← change this to whatever you want
+
+function PasswordGate({ onUnlock }) {
+  const [val, setVal] = useState('')
+  const [error, setError] = useState(false)
+  const check = () => {
+    if (val === PASSWORD) { sessionStorage.setItem('eop_auth', '1'); onUnlock() }
+    else { setError(true); setVal('') }
+  }
+  return (
+    <div className="pw-wrap">
+      <div className="pw-box">
+        <h1>Event <em>&amp; Outreach</em></h1>
+        <div className="pw-sub">Professional Networking Planner</div>
+        <input
+          className="pw-input"
+          type="password"
+          placeholder="Enter password…"
+          value={val}
+          onChange={e=>{ setVal(e.target.value); setError(false) }}
+          onKeyDown={e=>e.key==='Enter'&&check()}
+          autoFocus
+        />
+        <button className="pw-btn" onClick={check}>Enter</button>
+        {error && <div className="pw-error">Incorrect password. Try again.</div>}
+      </div>
+    </div>
+  )
+}
+
 // ── Main App ──────────────────────────────────────────────────────────────────
 export default function App() {
+  const [unlocked, setUnlocked] = useState(!!sessionStorage.getItem('eop_auth'))
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeId, setActiveId] = useState(null)
@@ -332,6 +376,8 @@ export default function App() {
   }
 
   const today = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' })
+
+  if (!unlocked) return <PasswordGate onUnlock={()=>setUnlocked(true)} />
 
   return (
     <div className="eop-wrap">
