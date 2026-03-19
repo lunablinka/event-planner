@@ -81,7 +81,7 @@ const CSS = `
   .sec-action { font-family: 'DM Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); background: none; border: none; cursor: pointer; }
   .sec-action:disabled { opacity: 0.45; cursor: default; }
 
-  .notes-box { width: 100%; min-height: 70px; padding: 10px 12px; border: 1px solid var(--border); background: var(--card); font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--ink); resize: vertical; line-height: 1.6; }
+  .notes-box { width: 100%; min-height: 70px; padding: 10px 12px; border: 1px solid var(--border); background: var(--card); font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--ink); resize: none; line-height: 1.6; overflow: hidden; }
   .notes-box:focus { outline: 2px solid var(--accent2); }
 
   .task-item { display: flex; align-items: flex-start; gap: 9px; padding: 9px 12px; background: var(--card); border: 1px solid var(--border); margin-bottom: 6px; transition: opacity 0.2s; }
@@ -195,7 +195,7 @@ function Modal({ title, onClose, onSave, saveLabel='Save', children }) {
 }
 
 // ── Password ─────────────────────────────────────────────────────────────────
-const PASSWORD = 'OdumPlanner'  // ← change this to whatever you want
+const PASSWORD = 'planner2026'  // ← change this to whatever you want
 
 function PasswordGate({ onUnlock }) {
   const [val, setVal] = useState('')
@@ -452,7 +452,18 @@ export default function App() {
 
               <div className="section">
                 <div className="sec-header"><span className="sec-title">Notes</span></div>
-                <textarea className="notes-box" value={notesDraft} onChange={e=>setNotesDraft(e.target.value)} onBlur={saveNotes} placeholder="Add context, research, key contacts to meet…"/>
+                <textarea
+                  className="notes-box"
+                  value={notesDraft}
+                  placeholder="Add context, research, key contacts to meet…"
+                  ref={el => { if (el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; } }}
+                  onChange={e => {
+                    setNotesDraft(e.target.value);
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  onBlur={saveNotes}
+                />
               </div>
 
               <div className="section">
