@@ -195,7 +195,7 @@ function Modal({ title, onClose, onSave, saveLabel='Save', children }) {
 }
 
 // ── Password ─────────────────────────────────────────────────────────────────
-const PASSWORD = 'planner2026'  // ← change this to whatever you want
+const PASSWORD = 'OdumPlanner'  // ← change this to whatever you want
 
 function PasswordGate({ onUnlock }) {
   const [val, setVal] = useState('')
